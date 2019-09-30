@@ -30,9 +30,6 @@ import com.srv.bookacab.customer.CustomerEntity;
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = { "createdAt", "updatedAt" }, allowGetters = true)
 public class DriverEntity implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -242930786924611717L;
 	public static final String TABLE_NAME = "driver";
 	public static final String DRVIER_ID = "driver_id";
@@ -51,9 +48,9 @@ public class DriverEntity implements Serializable {
 	@Column(name = DRIVER_NAME)
 	@NotBlank
 	private String driverName;
-	
+
 	@OneToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = CustomerEntity.CUSTOMER_ID, nullable = true)
+	@JoinColumn(name = CustomerEntity.CUSTOMER_ID, nullable = true)
 	private CustomerEntity customer;
 
 	@Column(name = LATITUDE, nullable = false)
@@ -111,6 +108,16 @@ public class DriverEntity implements Serializable {
 	}
 
 	public void setLongitude(Double longitude) {
+		this.longitude = longitude;
+	}
+
+	public DriverEntity() {
+
+	}
+
+	public DriverEntity(String driverName, Double latitude, Double longitude) {
+		this.driverName = driverName;
+		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 }

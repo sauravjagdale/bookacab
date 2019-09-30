@@ -1,5 +1,6 @@
 package com.srv.bookacab.customer;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -15,33 +16,36 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.srv.bookacab.driver.DriverEntity;
-import com.srv.bookacab.driver.DriverRepository;
+import com.srv.bookacab.driver.DriverService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/v1/customer")
 public class CustomerController {
-	
+
 	@Autowired
 	private CustomerRepository customerRepository;
-	
+
 	@Autowired
-	private DriverRepository driverRepository;
-	
+	private DriverService driverService;
+
 	@PostMapping("")
 	public CustomerEntity createCustomer(@Valid @RequestBody CustomerEntity note) {
-	    return customerRepository.save(note);
+		return customerRepository.save(note);
 	}
-	
+
+	@SuppressWarnings("rawtypes")
 	@GetMapping("/assignDriver/{customerId}")
-	public ResponseEntity<String> assignDriver(@PathVariable Long customerId){
+	public ResponseEntity<HashMap> assignDriver(@PathVariable Long customerId) {
+		HashMap<String, String> response = new HashMap<>();
 		Optional<CustomerEntity> customer = customerRepository.findById(customerId);
-		if(customer.isPresent()) {
-			DriverEntity drive = driverRepository.findNearestDriver(customer.get().getLatitude(), customer.get().getLongitude()).get(0);
-			return new ResponseEntity<String>("driver Assigned to "+customerId, HttpStatus.OK);
-		
-		}else 
-		return new ResponseEntity<String>("driver Assigned to "+customerId, HttpStatus.OK);
+		String message = "";
+		if (customer.isPresent()) {
+			message = driverService.assignDriver(customer.get());
+		} else {
+			message = "CustomerId Does Not Exist in db";
+		}
+		response.put("message", message);
+		return new ResponseEntity<HashMap>(response, HttpStatus.OK);
 	}
 }
